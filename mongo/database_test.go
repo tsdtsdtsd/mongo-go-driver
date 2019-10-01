@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsoncodec"
 	"go.mongodb.org/mongo-driver/internal/testutil/assert"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readconcern"
@@ -49,13 +50,15 @@ func TestDatabase(t *testing.T) {
 			wc2 := writeconcern.New(writeconcern.W(10))
 			rcLocal := readconcern.Local()
 			rcMajority := readconcern.Majority()
+			reg := bsoncodec.NewRegistryBuilder().Build()
 
 			opts := options.Database().SetReadPreference(rpPrimary).SetReadConcern(rcLocal).SetWriteConcern(wc1).
-				SetReadPreference(rpSecondary).SetReadConcern(rcMajority).SetWriteConcern(wc2)
+				SetReadPreference(rpSecondary).SetReadConcern(rcMajority).SetWriteConcern(wc2).SetRegistry(reg)
 			expected := &Database{
 				readPreference: rpSecondary,
 				readConcern:    rcMajority,
 				writeConcern:   wc2,
+				registry:       reg,
 			}
 			got := setupDb("foo", opts)
 			compareDbs(t, expected, got)
@@ -64,13 +67,15 @@ func TestDatabase(t *testing.T) {
 			rpPrimary := readpref.Primary()
 			rcLocal := readconcern.Local()
 			wc1 := writeconcern.New(writeconcern.W(10))
+			reg := bsoncodec.NewRegistryBuilder().Build()
 
-			client := setupClient(options.Client().SetReadPreference(rpPrimary).SetReadConcern(rcLocal))
+			client := setupClient(options.Client().SetReadPreference(rpPrimary).SetReadConcern(rcLocal).SetRegistry(reg))
 			got := client.Database("foo", options.Database().SetWriteConcern(wc1))
 			expected := &Database{
 				readPreference: rpPrimary,
 				readConcern:    rcLocal,
 				writeConcern:   wc1,
+				registry:       reg,
 			}
 			compareDbs(t, expected, got)
 		})
