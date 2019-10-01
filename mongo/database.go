@@ -318,6 +318,8 @@ func (db *Database) ListCollectionNames(ctx context.Context, filter interface{},
 		return nil, err
 	}
 
+	defer res.Close(ctx)
+
 	names := make([]string, 0)
 	for res.Next(ctx) {
 		next := &bsonx.Doc{}
