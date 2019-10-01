@@ -34,7 +34,7 @@ func compareDbs(t *testing.T, expected, got *Database) {
 	assert.Equal(t, expected.writeConcern, got.writeConcern,
 		"expected write concern %v, got %v", expected.writeConcern, got.writeConcern)
 	assert.Equal(t, expected.registry, got.registry,
-		"expected write concern %v, got %v", expected.registry, got.registry)
+		"expected registry %v, got %v", expected.registry, got.registry)
 }
 
 func TestDatabase(t *testing.T) {
